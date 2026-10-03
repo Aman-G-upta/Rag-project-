@@ -3,7 +3,13 @@ import { UploadCloud, FileText, Trash2, Search, Loader2, Sparkles, BookOpen, Ale
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import StatusBadge from "../components/StatusBadge";
-import { listDocuments, uploadDocument, deleteDocument, testSearch } from "../api/documents";
+import {
+  listDocuments,
+  getDocument,
+  uploadDocument,
+  deleteDocument,
+  testSearch,
+} from "../api/documents";
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
@@ -11,6 +17,8 @@ export default function Dashboard() {
 
   const [documents, setDocuments] = useState([]);
   const [loadingDocs, setLoadingDocs] = useState(true);
+  const [uploadSuccess, setUploadSuccess] = useState("");
+  const [deleteDoc, setDeleteDoc] = useState(null);
 
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
@@ -64,18 +72,43 @@ export default function Dashboard() {
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!file) return;
+
     setUploading(true);
     setUploadError("");
+    setUploadSuccess("");
     setUploadProgress(0);
+
     try {
-      await uploadDocument(file, { title, subject, onProgress: setUploadProgress });
+      const data = await uploadDocument(file, {
+        title,
+        subject,
+        onProgress: setUploadProgress,
+      });
+
+      const uploadedFileName = file.name;
+
       setFile(null);
       setTitle("");
       setSubject("");
-      if (fileInputRef.current) fileInputRef.current.value = "";
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
       fetchDocuments();
+
+      setUploadSuccess(
+        `"${uploadedFileName}" uploaded successfully and processing has started.`
+      );
+
+      checkProcessingStatus(data.document._id);
+
     } catch (err) {
-      setUploadError(err.response?.data?.message || "Upload failed");
+      console.error("Upload error:", err);
+
+      setUploadError(
+        err.response?.data?.message || err.message || "Upload failed"
+      );
     } finally {
       setUploading(false);
     }
@@ -105,6 +138,30 @@ export default function Dashboard() {
     } finally {
       setSearching(false);
     }
+  };
+  const checkProcessingStatus = async (documentId) => {
+    const interval = setInterval(async () => {
+      try {
+        const data = await getDocument(documentId);
+
+        const status = data.document.status;
+
+        if (status === "ready") {
+          clearInterval(interval);
+          setUploadSuccess("");
+          fetchDocuments();
+        }
+
+        if (status === "failed") {
+          clearInterval(interval);
+          setUploadSuccess("");
+          fetchDocuments();
+        }
+      } catch (error) {
+        console.error("Error checking document status:", error);
+        clearInterval(interval);
+      }
+    }, 2000);
   };
 
   return (
@@ -169,6 +226,25 @@ export default function Dashboard() {
                   </div>
                 )}
 
+                {uploadSuccess && (
+                  <div className="flex items-center justify-between gap-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 font-bold">
+                        ✓
+                      </span>
+                      {uploadSuccess}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setUploadSuccess("")}
+                      className="text-emerald-500 hover:text-emerald-700"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+
                 <button type="submit" disabled={!file || uploading}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-200 transition disabled:cursor-not-allowed disabled:opacity-50">
                   {uploading ? (<><Loader2 size={15} className="animate-spin" />Uploading {uploadProgress}%</>) : "Upload & process"}
@@ -185,7 +261,7 @@ export default function Dashboard() {
               <div className="mt-4 space-y-2.5">
                 {loadingDocs && <p className="py-6 text-center text-sm text-slate-400">Loading...</p>}
                 {!loadingDocs && documents.length === 0 && (
-                  <p className="py-6 text-center text-sm text-slate-400">No documents yet — upload your first PDF above.</p>
+                  <p className="py-6 text-center text-sm text-slate-400">No documents yet — upload your first study material above.</p>
                 )}
                 {documents.map((doc) => (
                   <div key={doc._id} className="flex items-center justify-between rounded-xl border border-slate-100 px-4 py-3 transition hover:border-slate-200 hover:bg-slate-50">
@@ -223,7 +299,11 @@ export default function Dashboard() {
 
 
                       <StatusBadge status={doc.status} />
-                      <button onClick={() => handleDelete(doc._id)} className="text-slate-300 transition hover:text-rose-500" title="Delete">
+                      <button
+                        onClick={() => setDeleteDoc(doc)}
+                        className="text-slate-300 transition hover:text-rose-500"
+                        title="Delete"
+                      >
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -298,6 +378,55 @@ export default function Dashboard() {
               )}
             </section>
           </div>
+
+          {deleteDoc && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+              <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-rose-50">
+                    <Trash2 size={18} className="text-rose-500" />
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-900">
+                      Delete document?
+                    </h3>
+
+                    <p className="mt-1 text-sm leading-relaxed text-slate-500">
+                      Are you sure you want to delete{" "}
+                      <span className="font-medium text-slate-700">
+                        "{deleteDoc.title}"
+                      </span>
+                      ? This action cannot be undone.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setDeleteDoc(null)}
+                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDelete(deleteDoc._id);
+                      setDeleteDoc(null);
+                    }}
+                    className="rounded-lg bg-rose-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-rose-600"
+                  >
+                    Delete
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
