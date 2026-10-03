@@ -51,8 +51,14 @@ export default function Dashboard() {
 
   const handleFileSelect = (selected) => {
     if (!selected) return;
+
     setFile(selected);
-    if (!title) setTitle(selected.name.replace(/\.pdf$/i, ""));
+
+    if (!title) {
+      setTitle(
+        selected.name.replace(/\.(pdf|docx|pptx)$/i, "")
+      );
+    }
   };
 
   const handleUpload = async (e) => {
@@ -135,11 +141,18 @@ export default function Dashboard() {
                 >
                   <FileText size={22} className="text-brand-500" />
                   <p className="mt-2 text-sm font-medium text-slate-700">
-                    {file ? file.name : "Drop a PDF here or click to browse"}
+                    {file ? file.name : "Drop a file here or click to browse"}
                   </p>
-                  <p className="mt-1 text-xs text-slate-400">PDF only · up to 20MB</p>
-                  <input ref={fileInputRef} type="file" accept="application/pdf" className="hidden"
-                    onChange={(e) => handleFileSelect(e.target.files?.[0])} />
+                  <p className="mt-1 text-xs text-slate-400">
+                    PDF, DOCX, PPTX · up to 20MB
+                  </p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.docx,.pptx"
+                    className="hidden"
+                    onChange={(e) => handleFileSelect(e.target.files?.[0])}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -265,7 +278,13 @@ export default function Dashboard() {
                   {searchResults.map((r, i) => (
                     <div key={i} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                       <div className="mb-1.5 flex items-center justify-between">
-                        <span className="text-xs font-semibold text-brand-700">Page {r.pageNumber}</span>
+                        <span className="text-xs font-semibold text-brand-700">
+                          {r.sourceType === "slide"
+                            ? `Slide ${r.sourceNumber}`
+                            : r.sourceType === "section"
+                              ? `Section ${r.sourceNumber}`
+                              : `Page ${r.sourceNumber}`}
+                        </span>
                         <span className="rounded-full bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-700">
                           {Math.round(r.score * 100)}% match
                         </span>

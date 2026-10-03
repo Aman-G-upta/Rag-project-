@@ -1,8 +1,17 @@
 const multer = require("multer");
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === "application/pdf") cb(null, true);
-  else cb(new Error("Only PDF files are supported right now"), false);
+  const allowedTypes = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ];
+
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only PDF, DOCX, and PPTX files are supported"), false);
+  }
 };
 
 const upload = multer({
