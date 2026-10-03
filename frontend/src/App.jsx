@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
 import QuizList from "./pages/QuizList";
 import QuizAttempt from "./pages/QuizAttempt";
+import WeakTopics from "./pages/WeakTopics";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/chat/:documentId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+          <Route path="/weak-topics" element={<ProtectedRoute><WeakTopics /></ProtectedRoute>} />
           <Route path="/quiz/:documentId" element={<ProtectedRoute><QuizList /></ProtectedRoute>} />
           <Route path="/quiz/take/:quizId" element={<ProtectedRoute><QuizAttempt /></ProtectedRoute>} />
         </Routes>
