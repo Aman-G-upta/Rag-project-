@@ -9,6 +9,7 @@ const authRoutes = require("./routes/auth.routes");
 const documentRoutes = require("./routes/document.routes");
 const chatRoutes = require("./routes/chat.routes");
 const quizRoutes = require("./routes/quiz.routes");
+const flashcardRoutes = require("./routes/flashcard.routes"); 
 
 connectDB();
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/quiz", quizRoutes);
+app.use("/api/flashcards", flashcardRoutes); 
 
 app.use(notFound);
 app.use(errorHandler);

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { UploadCloud, FileText, Trash2, Search, Loader2, Sparkles, BookOpen, AlertCircle, ClipboardList, MessageSquare } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { UploadCloud, FileText, Trash2, Search, Loader2, Sparkles, BookOpen, AlertCircle, ClipboardList, MessageSquare, Layers } from "lucide-react"; import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import StatusBadge from "../components/StatusBadge";
 import {
@@ -291,6 +290,13 @@ export default function Dashboard() {
                           >
                             <ClipboardList size={13} />
                             Quiz
+                          </Link>
+                          <Link
+                            to={`/flashcards/${doc._id}`}
+                            className="flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-700 transition hover:bg-amber-100"
+                          >
+                            <Layers size={13} />
+                            Flashcards
                           </Link>
                         </>
 
