@@ -33,7 +33,7 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
           </ul>
         </div>
 
-        <p className="relative text-xs text-slate-500">RepoForge Hackathon · Team Gencode</p>
+        
       </div>
 
       <div className="flex w-full flex-col justify-center px-6 py-12 sm:px-12 lg:w-1/2 lg:px-20">
