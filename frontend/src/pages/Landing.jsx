@@ -29,7 +29,7 @@ export default function Landing() {
         <div className="relative mx-auto max-w-3xl">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-brand-200">
             <BrainCircuit size={13} />
-            RepoForge Hackathon · Team Gencode
+            
           </span>
 
           <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl">
@@ -77,7 +77,7 @@ export default function Landing() {
       </section>
 
       <footer className="border-t border-white/10 px-6 py-8 text-center text-sm text-slate-500">
-        StudyLens — RAG-Based Student Study Assistant Chatbot · PS001
+        StudyLens — RAG-Based Student Study Assistant Chatbot 
       </footer>
     </div>
   );
