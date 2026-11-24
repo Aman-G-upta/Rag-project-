@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const cardSchema = new mongoose.Schema(
   {
     front: { type: String, required: true }, // question / term
-    back: { type: String, required: true }, // answer / definition
+    back: { type: String, required: true }, // answer 
     topic: { type: String, default: "General" },
     sourceNumber: { type: Number, default: null }, // page / slide / section number
     sourceType: { type: String, default: "page" }, // "page" | "slide" | "section"
